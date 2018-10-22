@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
+use App\Http\Requests\AdminCategoryRequest;
 use Illuminate\Http\Request;
 
 class AdminCategoryController extends Controller
@@ -19,7 +21,8 @@ class AdminCategoryController extends Controller
 
     public function index()
     {
-        return view('category.index');
+    	$categories = Category::paginate(2);
+        return view('category.index',compact('categories'));
     }
 
     /**
@@ -38,9 +41,13 @@ class AdminCategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AdminCategoryRequest $request)
     {
-        //
+		$this->validate( $request, $request->messages());
+		Category::create($request->all());
+		$request->session()->flash('message.level', 'success');
+		$request->session()->flash('message.content', 'New category added successfully!');
+		return redirect()->back();
     }
 
     /**
@@ -51,7 +58,8 @@ class AdminCategoryController extends Controller
      */
     public function show($id)
     {
-        //
+		$category = Category::findOrFail($id);
+		return view('category.show',compact('category'));
     }
 
     /**
@@ -60,9 +68,10 @@ class AdminCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit()
+    public function edit($id)
     {
-        return view('category.edit');
+    	$category = Category::findOrFail($id);
+        return view('category.edit', compact('category'));
     }
 
     /**
@@ -72,9 +81,15 @@ class AdminCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(AdminCategoryRequest $request, $id)
     {
-        //
+		$this->validate( $request, $request->messages());
+		$input = $request->all();
+		$category = Category::findOrFail($id);
+		$category->update($input);
+		$request->session()->flash('message.level', 'success');
+		$request->session()->flash('message.content', 'Category updated successfully!');
+		return redirect()->back();
     }
 
     /**
@@ -83,8 +98,14 @@ class AdminCategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,$id)
     {
-        //
+		$category = Category::findOrFail($id);
+
+		$category->delete();
+		$request->session()->flash('message.level', 'danger');
+		$request->session()->flash('message.content', 'Category deleted successfully!');
+
+		return redirect('/admin/category');
     }
 }

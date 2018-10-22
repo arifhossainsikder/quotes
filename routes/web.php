@@ -16,11 +16,8 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
+Route::resource('admin/category','AdminCategoryController');
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/admin/category/create', 'AdminCategoryController@create')->name('category.create');
-Route::get('/admin/category', 'AdminCategoryController@index')->name('category.index');
-Route::get('/admin/category/edit', 'AdminCategoryController@edit')->name('category.edit');
 Route::get('/admin/author/create', 'AdminAuthorController@create')->name('author.create');
 Route::get('/admin/author', 'AdminAuthorController@index')->name('author.index');
 Route::get('/admin/author/view', 'AdminAuthorController@show')->name('author.view');
