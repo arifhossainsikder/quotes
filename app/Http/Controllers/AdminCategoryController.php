@@ -21,7 +21,7 @@ class AdminCategoryController extends Controller
 
     public function index()
     {
-    	$categories = Category::paginate(2);
+    	$categories = Category::paginate(10);
         return view('category.index',compact('categories'));
     }
 
@@ -101,6 +101,8 @@ class AdminCategoryController extends Controller
     public function destroy(Request $request,$id)
     {
 		$category = Category::findOrFail($id);
+
+		$category->posts()->detach();
 
 		$category->delete();
 		$request->session()->flash('message.level', 'danger');

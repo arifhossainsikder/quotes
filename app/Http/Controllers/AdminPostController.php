@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Author;
+use App\Category;
+use App\Http\Requests\AdminPostRequest;
+use App\Post;
 use Illuminate\Http\Request;
 
 class AdminPostController extends Controller
@@ -13,7 +17,8 @@ class AdminPostController extends Controller
      */
     public function index()
     {
-        return view('post.index');
+    	$posts = Post::orderBy('id','desc')->paginate(10);
+        return view('post.index',compact('posts'));
     }
 
     /**
@@ -23,7 +28,9 @@ class AdminPostController extends Controller
      */
     public function create()
     {
-        return view('post.create');
+    	$authors = Author::orderBy('name','asc')->pluck('name','id')->all();
+		$categories = Category::orderBy('title','asc')->pluck('title','id')->all();
+        return view('post.create',compact('authors','categories'));
     }
 
     /**
@@ -32,9 +39,24 @@ class AdminPostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AdminPostRequest $request)
     {
-        //
+		$this->validate($request, $request->messages());
+
+		$post = new Post;
+
+		$post->author_id = $request->author_id;
+
+		$post->quote = $request->quote;
+
+		$post->save();
+
+		$post->categories()->attach($request->categories);
+
+
+		$request->session()->flash('message.level', 'success');
+		$request->session()->flash('message.content', 'New quote added successfully!');
+		return redirect()->back();
     }
 
     /**
@@ -43,9 +65,10 @@ class AdminPostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show($id)
     {
-        return view('post.show');
+    	$post = Post::findOrFail($id);
+        return view('post.show',compact('post'));
     }
 
     /**
@@ -54,9 +77,12 @@ class AdminPostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit()
+    public function edit($id)
     {
-        return view('post.edit');
+    	$post = Post::findOrFail($id);
+		$authors = Author::orderBy('name','asc')->pluck('name','id')->all();
+		$categories = Category::orderBy('title','asc')->pluck('title','id')->all();
+        return view('post.edit',compact('post','authors','categories'));
     }
 
     /**
@@ -66,9 +92,21 @@ class AdminPostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(AdminPostRequest $request, $id)
     {
-        //
+		$this->validate($request, $request->messages());
+
+		$post = Post::findOrFail($id);
+
+		$input = $request->all();
+
+		Post::whereId($id)->first()->update($input);
+
+		$post->categories()->sync($request->categories);
+
+		$request->session()->flash('message.level', 'success');
+		$request->session()->flash('message.content', 'Updated successfully!');
+		return redirect()->back();
     }
 
     /**
@@ -77,8 +115,18 @@ class AdminPostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+		$post = Post::findOrFail($id);
+
+		$post->categories()->detach();
+
+		$post->delete();
+
+		$request->session()->flash('message.level', 'danger');
+		$request->session()->flash('message.content','Deleted successfully!');
+
+		return redirect('/admin/post');
+
     }
 }

@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('styles')
+    <link rel="stylesheet" href="/css/select2.min.css">
+@endsection
 
 @section('content')
     <div class="container">
@@ -7,42 +10,52 @@
             <div class="col-md-8">
                 <h3>Add new quote</h3>
                 <hr>
-                <form class="form-horizontal" action="/action_page.php">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="quote">Quote:</label>
-                        <div class="col-sm-10">
-                            <textarea name="quote" id="quote" class="form-control"></textarea>
-                        </div>
+                @include('includes.form_error')
+                @if(session()->has('message.level'))
+                    <div class="alert alert-{{ session('message.level') }}">
+                        {!! session('message.content') !!}
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="quote">Select author:</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" id="sel1">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                            </select>
-                        </div>
+                @endif
+                {!! Form::open(['method' => 'POST', 'action' => 'AdminPostController@store', 'class'=>'form-horizontal']) !!}
+                <div class="form-group">
+                    {!! Form::label('quote','Quote:',['class'=>'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::textarea('quote',null, ['class' => 'form-control']) !!}
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="quote">Select category:</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" id="sel1">
-                                <option>1</option>
-                                <option>2</option>
-                                <option>3</option>
-                                <option>4</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="form-group">
+                    {!! Form::label('author_id','Select author:',['class' => 'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::select('author_id', $authors, null, ['class' => 'form-control','id'=>'select-author','placeholder' => 'Please select']) !!}
                     </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-default">Submit</button>
-                        </div>
+
+                </div>
+                <div class="form-group">
+                    {!! Form::label('categories','Select category:',['class' => 'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::select('categories[]', $categories, null, ['class' => 'form-control','id'=>'select-category','multiple'=>'multiple']) !!}
                     </div>
-                </form>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        {!! Form::submit('Submit', ['class' => 'btn btn-default']) !!}
+                    </div>
+                </div>
+                {!! Form::close() !!}
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script src="/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#select-category").select2();
+            $("#select-author").select2({
+                placeholder: "Select author",
+                allowClear: true
+            });
+        });
+    </script>
 @endsection

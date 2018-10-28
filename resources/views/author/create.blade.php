@@ -7,32 +7,37 @@
             <div class="col-md-8">
                 <h3>Add new author</h3>
                 <hr>
-                <form class="form-horizontal" action="/action_page.php">
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="name">Name:</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="name" name="name"
-                                   placeholder="Enter author name">
-                        </div>
+                @include('includes.form_error')
+                @if(session()->has('message.level'))
+                    <div class="alert alert-{{ session('message.level') }}">
+                        {!! session('message.content') !!}
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="photo">Upload photo:</label>
-                        <div class="col-sm-10">
-                            <input type="file" class="form-control" id="photo" name="photo">
-                        </div>
+                @endif
+                {!! Form::open(['method' => 'POST', 'class'=>'form-horizontal', 'action' => 'AdminAuthorController@store', 'files'=>true]) !!}
+                <div class="form-group">
+                    {!! Form::label('name','Name:',['class' => 'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::text('name',null, ['class' => 'form-control','id'=> 'name','placeholder' => 'Enter author name']) !!}
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-2" for="bio">Bio:</label>
-                        <div class="col-sm-10">
-                            <textarea name="bio" id="bio"></textarea>
-                        </div>
+                </div>
+                <div class="form-group">
+                    {!! Form::label('photo_id','Upload photo:',['class' => 'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::file('photo_id',null, ['class' => 'form-control','id'=>'photo']) !!}
                     </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-default">Submit</button>
-                        </div>
+                </div>
+                <div class="form-group">
+                    {!! Form::label('bio','Bio:',['class' => 'control-label col-sm-2']) !!}
+                    <div class="col-sm-10">
+                        {!! Form::textarea('bio',null, ['id' => 'bio']) !!}
                     </div>
-                </form>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        {!! Form::submit('Submit', ['class' => 'btn btn-default']) !!}
+                    </div>
+                </div>
+                {!! Form::close() !!}
             </div>
         </div>
     </div>
@@ -40,5 +45,5 @@
 
 @section('scripts')
     <script src="https://cloud.tinymce.com/stable/tinymce.min.js"></script>
-    <script>tinymce.init({ selector:'textarea' });</script>
+    <script>tinymce.init({selector: 'textarea'});</script>
 @endsection

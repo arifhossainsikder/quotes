@@ -9,4 +9,8 @@ class Category extends Model
     protected $fillable = [
     	'title'
 	];
+
+    public function posts(){
+    	return $this->belongsToMany('App\Post','post_category');
+	}
 }

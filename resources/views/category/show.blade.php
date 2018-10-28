@@ -9,12 +9,45 @@
         </div>
         <div class="row">
             <div class="col-md-2">
-                <a class="btn alert alert-success text-center" href="{{ route('category.edit',$category->id) }}"><i class="fa fa-edit fa-2x"></i></a>
+                <a class="btn alert alert-success text-center" href="{{ route('category.edit',$category->id) }}"><i
+                            class="fa fa-edit fa-2x"></i></a>
             </div>
             <div class="col-md-2">
                 {!! Form::open(['method' => 'DELETE', 'action' => ['AdminCategoryController@destroy',$category->id], 'class' =>'form-delete']) !!}
                 {!! Form::button( '<i class="fa fa-trash fa-2x"></i>', ['type' => 'submit', 'name' => 'delete_modal', 'class' => 'alert alert-danger form-delete'] ) !!}
                 {!! Form::close() !!}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{{ $category->title }}
+                    <small> {{ $category->posts->count() }} quotes</small>
+                </h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>View</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($category->posts as $post)
+                            <tr>
+                                <td>{{ $post->id }}</td>
+                                <td>{{ $post->quote }}</td>
+                                <td><a href="{{ route('post.show',$post->id) }}" class="btn btn-default">View</a></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
